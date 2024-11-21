@@ -2,10 +2,14 @@ import React from "react";
 import MovieForm from "@/app/(protected)/movie/components/movie-form";
 import { cookies } from 'next/headers';
 
-async function EditMoviePage({ params }: { params: { id: string } }) {
+export const dynamic = 'force-dynamic'
+
+
+async function EditMoviePage({ params }: { params: Promise<{ id: string }> }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   const cookieHeader = await cookies().toString();
-  const response = await fetch(`${baseUrl}/api/movies/${params.id}`, { 
+  const id = (await params).id
+  const response = await fetch(`${baseUrl}/api/movies/${id}`, { 
     cache: 'no-store',
     credentials: 'include',  // This forwards cookies
     headers: {

@@ -13,12 +13,11 @@ export async function authGuard(): Promise<IUser> {
 
   // Step 1: Extract the token from the cookies
   const cookie = await cookies();
-  const token = cookie.get('accessToken')?.value;
+  const token = cookie.get("accessToken")?.value;
 
   if (!token) {
     throw new CustomError("Access token is missing or invalid.", 400, true);
   }
-  
   // Step 2: Verify the JWT Token
   const decode = verifyToken(token, JWT_TYPE_ENUM.ACCESS);
 

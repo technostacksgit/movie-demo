@@ -114,7 +114,6 @@ function MovieForm({ movie }: { movie?: IMovie }) {
             render={({ field }) => (
               <ImageUpload
                 onChange={(file) => {
-                  console.log("file", file);
                   setValue("image", file,{shouldValidate:true})
                 }}
                 value={typeof field.value === 'string' ? null : field.value}

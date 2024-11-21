@@ -1,7 +1,7 @@
-import CustomError from '@/lib/customError';
-import { handleError } from '@/lib/errorHandler';
-import { Types } from 'mongoose';
-import Movie from '../models/movie';
+import CustomError from "@/lib/customError";
+import { handleError } from "@/lib/errorHandler";
+import { Types } from "mongoose";
+import Movie from "../models/movie";
 
 /**
  * Create a new movie document.
@@ -14,13 +14,9 @@ export const createNewMovie = async (movieData: {
   releaseYear: number;
   userId: Types.ObjectId;
 }) => {
-  try {
-    // Create a new movie
-    const newMovie = await Movie.create(movieData);
-    return newMovie;
-  } catch (error) {
-    return handleError(error)
-  }
+  // Create a new movie
+  const newMovie = await Movie.create(movieData);
+  return newMovie;
 };
 
 /**
@@ -29,13 +25,16 @@ export const createNewMovie = async (movieData: {
  * @param userId The user ID to verify ownership of the movie.
  * @returns Movie document or an error if not found or unauthorized.
  */
-export const getMovieFromId = async (movieId: string, userId: Types.ObjectId) => {
-    const movie = await Movie.findOne({
-      _id: movieId,
-      userId,
-      isDeleted: false
-    });
-    return movie;
+export const getMovieFromId = async (
+  movieId: string,
+  userId: Types.ObjectId
+) => {
+  const movie = await Movie.findOne({
+    _id: movieId,
+    userId,
+    isDeleted: false,
+  });
+  return movie;
 };
 
 /**
@@ -44,34 +43,36 @@ export const getMovieFromId = async (movieId: string, userId: Types.ObjectId) =>
  * @param pagination - Pagination information including page and limit
  * @returns Array of movie documents or an error
  */
-export const getAllMovies = async (userId: Types.ObjectId, pagination: Pagination) => {
+export const getAllMovies = async (
+  userId: Types.ObjectId,
+  pagination: Pagination
+) => {
   const { page, limit, skip } = pagination;
 
-  try {
-    // Query the database with pagination
-    const movies = await Movie.find({
-      userId,
-      isDeleted: false
-    })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+  // Query the database with pagination
+  const movies = await Movie.find({
+    userId,
+    isDeleted: false,
+  })
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
-    // Get the total count for pagination
-    const totalMovies = await Movie.countDocuments({ userId, isDeleted: false });
+  // Get the total count for pagination
+  const totalMovies = await Movie.countDocuments({
+    userId,
+    isDeleted: false,
+  });
 
-    return {
-      movies,
-      pagination: {
-        totalMovies,
-        totalPages: Math.ceil(totalMovies / limit),
-        currentPage: page,
-        limit,
-      },
-    };
-  } catch (error) {
-    return handleError(error);
-  }
+  return {
+    movies,
+    pagination: {
+      totalMovies,
+      totalPages: Math.ceil(totalMovies / limit),
+      currentPage: page,
+      limit,
+    },
+  };
 };
 /**
  * Update a movie document by ID.
@@ -79,23 +80,22 @@ export const getAllMovies = async (userId: Types.ObjectId, pagination: Paginatio
  * @param updateData Object containing fields to update
  * @returns Updated movie document or an error
  */
-export const updateMovieFromId = async (id: string, updateData: Partial<{
-  posterImage: string;
-  title: string;
-  releaseYear: number;
-  created_by: string;
-}>) => {
-  try {
-    const updatedMovie = await Movie.findByIdAndUpdate(id, updateData);
+export const updateMovieFromId = async (
+  id: string,
+  updateData: Partial<{
+    posterImage: string;
+    title: string;
+    releaseYear: number;
+    created_by: string;
+  }>
+) => {
+  const updatedMovie = await Movie.findByIdAndUpdate(id, updateData);
 
-    if (!updatedMovie) {
-      throw new CustomError('Movie not found', 404);
-    }
-
-    return updatedMovie;
-  } catch (error) {
-    return handleError(error)
+  if (!updatedMovie) {
+    throw new CustomError("Movie not found", 404);
   }
+
+  return updatedMovie;
 };
 
 /**
@@ -104,20 +104,16 @@ export const updateMovieFromId = async (id: string, updateData: Partial<{
  * @returns Updated movie document or an error
  */
 export const softDeleteMovie = async (movieId: string) => {
-  try {
-    // Find and update the movie with a `deleted` flag
-    const updatedMovie = await Movie.findByIdAndUpdate(
-      movieId,
-      { isDeleted: true },
-      { new: true } // Return the updated document
-    );
+  // Find and update the movie with a `deleted` flag
+  const updatedMovie = await Movie.findByIdAndUpdate(
+    movieId,
+    { isDeleted: true },
+    { new: true } // Return the updated document
+  );
 
-    if (!updatedMovie) {
-      throw new Error('Movie not found');
-    }
-
-    return updatedMovie;
-  } catch (error) {
-    return handleError(error);
+  if (!updatedMovie) {
+    throw new Error("Movie not found");
   }
+
+  return updatedMovie;
 };

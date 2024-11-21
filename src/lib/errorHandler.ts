@@ -11,7 +11,6 @@ export function handleError(error: unknown) {
       message: err.message,
     }));
 
-    console.log("\n\n\n\nFormatted error: ", formattedErrors);
     return NextResponse.json({
       success: false,
       message: 'Validation Error',

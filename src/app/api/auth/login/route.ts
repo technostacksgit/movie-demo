@@ -8,6 +8,125 @@ import { generateToken } from '@/lib/utils/auth/jwt.utils';
 import { JWT_TYPE_ENUM } from '@/lib/constants/enums/common.enum';
 import { cookies } from 'next/headers';
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticates a user and generates access and refresh tokens. Optionally, sets a "remember me" session.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The email of the user.
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: The password of the user.
+ *                 example: StrongPassword123
+ *               rememberMe:
+ *                 type: boolean
+ *                 description: If true, generates a refresh token for persistent login.
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Login successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                           description: Unique user ID.
+ *                           example: 64f8d88e83b0a6f5e76a2d3b
+ *                         email:
+ *                           type: string
+ *                           format: email
+ *                           description: The user's email.
+ *                           example: user@example.com
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                           description: The timestamp of user creation.
+ *                           example: 2024-01-15T12:34:56.789Z
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           description: The timestamp of the last user update.
+ *                           example: 2024-03-12T08:15:30.123Z
+ *                     accessToken:
+ *                       type: string
+ *                       description: The JWT access token.
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     refreshToken:
+ *                       type: string
+ *                       description: The JWT refresh token (if `rememberMe` is true).
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Invalid credentials.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid credentials
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   description: The error message.
+ */
+
 export async function POST(req: NextRequest) {
   await dbConnect();
 

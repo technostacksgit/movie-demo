@@ -10,6 +10,8 @@ import { handleError } from "@/lib/errorHandler";
  * @swagger
  * /api/s3/presigned-url:
  *   post:
+ *     tags:
+ *       - S3 Operations
  *     summary: Generate a pre-signed URL for S3 operations
  *     description: Returns a pre-signed URL for the given object key and operation (GET/PUT)
  *     requestBody:
@@ -66,6 +68,7 @@ import { handleError } from "@/lib/errorHandler";
  *                   type: string
  *                   description: Error message
  */
+
 export async function POST(request: NextRequest) {
   try {
     // Check if the user is authenticated

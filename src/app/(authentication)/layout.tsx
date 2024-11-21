@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { getUserFromToken } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import "../globals.css";
+export const dynamic = 'force-dynamic'
 
 export default async function RootLayout({
   children,
@@ -9,7 +10,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const {user} = await getUserFromToken();
-
   if (user) {
     return redirect("/dashboard");
   }

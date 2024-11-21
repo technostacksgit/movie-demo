@@ -65,7 +65,7 @@ function MoviesList({
         <MovieListHeader />
 
         {/* List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-[24px] place-items-center mt-5 lg:mt-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] sm:gap-[24px] place-items-center mt-5 lg:mt-10">
           {data.movies.length > 0 &&
             data.movies.map(({ _id, posterImage, title, releaseYear }) => (
               <Link href={`/movie/${_id}`} key={_id}>

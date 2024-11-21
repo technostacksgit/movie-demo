@@ -8,7 +8,6 @@ import User, { IUser } from '@/models/user';
 export const getUserByEmail = async (email: string): Promise<IUser | null> => {
   try {
     const user = await User.findOne({ email }).lean<IUser>();
-    console.log("User from service: ", user);
     return user;
   } catch (error) {
     console.error('Error fetching user by email:', error);

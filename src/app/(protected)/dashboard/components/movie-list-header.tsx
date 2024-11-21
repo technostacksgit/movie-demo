@@ -2,7 +2,6 @@ import { toast } from "@/hooks/useToast";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { unknown } from "zod";
 
 function MovieListHeader() {
   const router = useRouter();
@@ -49,7 +48,7 @@ function MovieListHeader() {
         onClick={() => handleLogout()}
         className="font-bold flex text-[16px] hover:cursor-pointer justify-end"
       >
-        <span className="mr-[16px]  sm:flex inline-block">Logout</span>
+        <span className="mr-[16px] hidden sm:flex ">Logout</span>
         <Image
           src="/assets/images/logout.svg"
           height={24}

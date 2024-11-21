@@ -46,7 +46,7 @@ function Card({
           width={500}
           height={500}
           src={`${process.env.NEXT_PUBLIC_S3_BUCKET_URL}/${posterUrl}`}
-          className="w-full h-full min-h-[400px] object-cover rounded-lg"
+          className="w-full min-h-[250px] h-[250px] lg:min-h-[400px] object-cover rounded-lg"
           alt={title}
         />
         <div className="px-8 flex flex-col justify-center text-primary-foreground text-sm font-medium">
