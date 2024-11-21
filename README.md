@@ -66,15 +66,17 @@ http://localhost:3000
 ## **Project Structure**
 
 ```bash
-project-directory/
-├── components/        # Reusable UI components
-├── pages/             # Next.js pages
-│   ├── api/           # API routes for server-side logic
-│   ├── auth/          # Login and Register pages
-│   └── movies/        # CRUD functionality for movies
-├── public/            # Static files
-├── styles/            # CSS modules
-└── README.md          # Documentation
+project-name/
+├── src/
+│   ├── app
+│   ├── components
+│   ├── hooks
+│   ├── lib
+│   ├── models
+│   ├── services
+│   ├── store
+│   ├── styles
+│   └── types
 ```
 
 ## **Technologies Used**
