@@ -32,8 +32,8 @@ function MovieForm({ movie }: { movie?: IMovie }) {
   const onSubmit = async (data: FormData) => {
     // Request presigned URL
     let url = data.image as string;
-    if(data.image instanceof File) {
-      url = (Date.now() + "-" + data.image?.name);
+    if (data.image instanceof File) {
+      url = Date.now() + "-" + data.image?.name;
       const presignedUrlRawData = await fetch("/api/s3/presigned-url", {
         method: "POST",
         body: JSON.stringify({
@@ -46,21 +46,24 @@ function MovieForm({ movie }: { movie?: IMovie }) {
       const uploadedImage = await fetch(presignedUrl, {
         method: "PUT",
         headers: {
-          "Content-Type": data.image?.type || "", 
+          "Content-Type": data.image?.type || "",
         },
         body: data.image,
       });
+
       if (!uploadedImage.ok) {
-        console.error("Image upload failed", uploadedImage);
+        toast({
+          title: "failed to upload image",
+          description: "Please try again",
+          variant: "destructive",
+        });
         return;
       }
-
     }
-
 
     // Add movie information
     if (movie) {
-      await fetch(`/api/movies/${movie._id}`, {
+      const updateMovie = await fetch(`/api/movies/${movie._id}`, {
         method: "PUT",
         body: JSON.stringify({
           posterImage: url,
@@ -68,10 +71,29 @@ function MovieForm({ movie }: { movie?: IMovie }) {
           title: data.title,
         }),
       });
-      toast({
-        title: "Movie updated successfully",
-      });
-      router.push("/dashboard");
+
+      if (updateMovie.ok) {
+        toast({
+          title: "The Force is Strong! Movie details updated!",
+          description: "Like a Jedi mastering their craft, your movie details have been refreshed.",
+          variant: "default",
+        });
+        router.push("/dashboard");
+      } else if (updateMovie.status < 500) {
+        const body = await updateMovie.json();
+        toast({
+          title: body?.message,
+          variant: "warning",
+        });
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again",
+          variant: "destructive",
+        });
+      }
+      router.replace("/dashboard");
+      router.refresh();
     } else {
       const movieResponse = await fetch("/api/movies/add", {
         method: "POST",
@@ -81,17 +103,25 @@ function MovieForm({ movie }: { movie?: IMovie }) {
           title: data.title,
         }),
       });
-    
+
       if (movieResponse.ok) {
-        router.push("/dashboard");
+        toast({
+          title: "Lights, Camera, Action! Movie added!",
+          description: "Like 'The Godfather,' this one's now a part of the family.",
+          variant: "default",
+        });
+        router.replace("/dashboard");
+        router.refresh();
       } else {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again",
+          variant: "destructive",
+        });
         console.error("Failed to add movie");
       }
     }
-
-    
   };
-  
 
   const handleCancel = () => router.push("/dashboard");
 
@@ -101,7 +131,7 @@ function MovieForm({ movie }: { movie?: IMovie }) {
       className="container py-10 lg:py-20"
     >
       <div className="text-primary-foreground font-semibold text-[32px] lg:text-[48px] mb-5 lg:mb-20">
-        Create a new movie
+        {movie ? "Edit movie" : "Create a new movie"}
       </div>
       <div className="flex flex-wrap">
         <div className="w-full lg:w-1/2">
@@ -114,16 +144,16 @@ function MovieForm({ movie }: { movie?: IMovie }) {
             render={({ field }) => (
               <ImageUpload
                 onChange={(file) => {
-                  setValue("image", file,{shouldValidate:true})
+                  setValue("image", file, { shouldValidate: true });
                 }}
-                value={typeof field.value === 'string' ? null : field.value}
+                value={typeof field.value === "string" ? null : field.value}
                 image={movie?.posterImage}
               />
             )}
           />
-            {errors.image && (
-              <p className="text-red-500 py-4 text-sm">{errors.image.message}</p>
-            )}
+          {errors.image && (
+            <p className="text-red-500 py-4 text-sm">{errors.image.message}</p>
+          )}
         </div>
         <div className="w-full lg:w-1/2 lg:max-w-[375px] mt-[20px]">
           <div className="mb-64">
@@ -145,7 +175,9 @@ function MovieForm({ movie }: { movie?: IMovie }) {
               )}
             />
             {errors.title && (
-              <p className="text-red-500 py-4 text-sm">{errors.title.message}</p>
+              <p className="text-red-500 py-4 text-sm">
+                {errors.title.message}
+              </p>
             )}
 
             <Controller
@@ -153,8 +185,14 @@ function MovieForm({ movie }: { movie?: IMovie }) {
               control={control}
               rules={{
                 required: "Year is required",
-                validate: (value) =>
-                  !isNaN(Number(value)) || "Year must be a number",
+                validate: (value) => {
+                  const year = Number(value);
+                  const currentYear = new Date().getFullYear(); // Get the current year
+                  if (isNaN(year)) return "Year must be a number";
+                  if (year <= 1700) return "Year must be greater than 1700";
+                  if (year > currentYear) return `Year cannot exceed the current year (${currentYear})`;
+                  return true; // Valid
+                },
               }}
               render={({ field }) => (
                 <Input
@@ -181,7 +219,14 @@ function MovieForm({ movie }: { movie?: IMovie }) {
             >
               Cancel
             </Button>
-            <Button loading={isSubmitting} disabled={isSubmitting} variant="default" size="sm" className="w-1/2" type="submit">
+            <Button
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              variant="default"
+              size="sm"
+              className="w-1/2"
+              type="submit"
+            >
               Submit
             </Button>
           </div>

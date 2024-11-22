@@ -24,8 +24,10 @@ function DashboardEmptyState() {
       });
     } else {
       toast({
-        title: "Something went wrong.",
-      });
+        title: "Something went wrong",
+        description: "Please try again",
+        variant: "destructive"
+    });
     }
   };
 

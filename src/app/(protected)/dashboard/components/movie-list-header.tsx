@@ -18,11 +18,15 @@ function MovieListHeader() {
     if (data) {
       router.replace("/login");
       toast({
-        title: "Logged out successfully!",
+        title: "You’ve left the set!",
+        description: "The show’s over... for now. See you next time!",
+        variant: "default",
       });
     } else {
       toast({
-        title: "Something went wrong.",
+        title: "Something went wrong",
+        description: "Please try again",
+        variant: "destructive",
       });
     }
   };

@@ -74,7 +74,9 @@ input::placeholder {
     @apply border-border;
   }
 }
-
+body {
+  font-family: 'Montserrat' !important;
+}
 .container {
   @apply max-w-[1280px] mx-auto px-[20px];
 }

@@ -7,6 +7,7 @@ import { useApi } from "@/hooks/useApi";
 import { toast } from "@/hooks/useToast";
 import { loginSchema } from "@/lib/validations/auth/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -36,7 +37,11 @@ export function LoginForm() {
   useEffect(() => {
     if (data) {
       // Set success toast notification
-      toast({ title: "Login successful!" });
+      toast({
+        title: "Welcome back, you've hit 'Play'!",
+        description: "It's like *The Matrix* – you're back in action!",
+        variant: "default",
+      });
       // Redirect after the login is successful
       router.replace('/dashboard'); 
     } else if (error) {
@@ -100,7 +105,7 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="mb-24 flex items-center justify-center w-full">
+      <div className="mb-[18px] flex items-center justify-center w-full">
         <Checkbox
           id="rememberMeCheckbox"
           className="h-[17px] w-[18px] mr-8 bg-input outline-none border-none"
@@ -114,8 +119,11 @@ export function LoginForm() {
         </Label>
       </div>
 
-      <div>
+      <div className="mb-[1.1rem]">
         <Button type="submit" disabled={isLoading}>Login</Button>
+      </div>
+      <div className="font-normal text-[14px] text-primary-foreground/70 tracking-wider">
+        <span>Join the Journey - </span> <Link href={'/register'} className="text-primary"> Sign Up Now!</Link>
       </div>
     </form>
   );

@@ -1,3 +1,4 @@
+
 const nextConfig = {
   /* config options here */
   images: {
