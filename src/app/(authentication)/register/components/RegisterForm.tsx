@@ -11,9 +11,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useApi } from "@/hooks/useApi";
+import { useEffect } from "react";
 
 const RegisterForm = () => {
   const router = useRouter();
+  const { callApi, data, error, isLoading } = useApi();
   const {
     register,
     handleSubmit,
@@ -25,37 +28,37 @@ const RegisterForm = () => {
       password: "",
       confirmPassword: "",
     },
-    mode: 'onBlur'
+    mode: "onBlur",
   });
 
-  const onSubmit = async (data: RegisterSchema) => {
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (response.ok) {
+  useEffect(() => {
+    if (data) {
+      // Assuming successful API call
       toast({
         title: "Your blockbuster account is ready!",
-        description: "Roll the credits and log in to start your journey.",
+        description: "Roll the credits and add your first movie!",
         variant: "default",
       });
-      router.push("/dashboard");
-    } else if(response.status < 500){
-        const body = await response.json();
-      toast({
-        title: body?.message,
-        variant: "warning",
-      });
-    }else {
-        toast({
-            title: "Something went wrong",
-            description: "Please try again",
-            variant: "destructive"
-        });
+      return router.push("/dashboard");
     }
+    if (error) {
+      toast({
+        title: error || "An error occurred",
+        variant: `${error ? 'warning' : 'destructive'}`,
+      });
+    }
+  }, [error, data, router]);
+
+  const onSubmit = async (data: RegisterSchema) => {
+      await callApi({
+        url: "/api/auth/register",
+        method: "POST",
+        body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
   };
 
   return (
@@ -119,7 +122,9 @@ const RegisterForm = () => {
       </div>
 
       <div className="mb-[1.1rem]">
-        <Button type="submit">Sign up</Button>
+        <Button type="submit" loading={isLoading}>
+          Sign up
+        </Button>
       </div>
       <div className="font-normal text-[14px] text-primary-foreground/70 tracking-wider">
         <span>Already have an account? </span>{" "}

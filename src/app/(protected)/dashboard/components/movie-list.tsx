@@ -51,7 +51,7 @@ function MoviesList({
     try {
       // Send delete request to the API
       const deleteResponse = await fetch(
-        `http://localhost:3000/api/movies/${movieId}`,
+        `api/movies/${movieId}`,
         {
           method: "DELETE",
         }

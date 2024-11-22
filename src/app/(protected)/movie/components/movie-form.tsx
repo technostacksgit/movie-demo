@@ -2,9 +2,11 @@
 import { Button } from "@/components/ui/button";
 import ImageUpload from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
+import { useApi } from "@/hooks/useApi";
 import { toast } from "@/hooks/useToast";
 import { IMovie } from "@/models/movie";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 type FormData = {
@@ -28,6 +30,56 @@ function MovieForm({ movie }: { movie?: IMovie }) {
   });
 
   const router = useRouter();
+  const {
+    callApi: callUpdateMovieApi,
+    data: updatedMovie,
+    error: updateMovieError,
+  } = useApi();
+
+  const {
+    callApi: callAddDataApi,
+    data: addMovieData,
+    error: addMovieError,
+  } = useApi();
+
+  useEffect(() => {
+    if (updatedMovie) {
+      toast({
+        title: "Your blockbuster account is ready!",
+        description: "Roll the credits and add your first movie!",
+        variant: "default",
+      });
+
+      router.replace("/dashboard");
+      router.refresh();
+      return;
+    }
+    if (updateMovieError) {
+      toast({
+        title: updateMovieError || "An error occurred",
+        variant: `${updateMovieError ? "warning" : "destructive"}`,
+      });
+    }
+  }, [updateMovieError, updatedMovie, router]);
+
+  useEffect(() => {
+    if (addMovieData) {
+      toast({
+        title: "Lights, Camera, Action! Movie added!",
+        description:
+          "Like 'The Godfather,' this one's now a part of the family.",
+        variant: "default",
+      });
+      router.replace("/dashboard");
+      router.refresh();
+    }
+    if (addMovieError) {
+      toast({
+        title: addMovieError || "An error occurred",
+        variant: `${addMovieError ? "warning" : "destructive"}`,
+      });
+    }
+  }, [addMovieData, addMovieError, router]);
 
   const onSubmit = async (data: FormData) => {
     // Request presigned URL
@@ -63,63 +115,31 @@ function MovieForm({ movie }: { movie?: IMovie }) {
 
     // Add movie information
     if (movie) {
-      const updateMovie = await fetch(`/api/movies/${movie._id}`, {
+      await callUpdateMovieApi({
+        url: `/api/movies/${movie._id}`,
         method: "PUT",
-        body: JSON.stringify({
-          posterImage: url,
+        body: {
+          posterImage: url, // Ensure `url` is defined and accessible
           releaseYear: parseInt(data.year, 10),
           title: data.title,
-        }),
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-
-      if (updateMovie.ok) {
-        toast({
-          title: "The Force is Strong! Movie details updated!",
-          description: "Like a Jedi mastering their craft, your movie details have been refreshed.",
-          variant: "default",
-        });
-        router.push("/dashboard");
-      } else if (updateMovie.status < 500) {
-        const body = await updateMovie.json();
-        toast({
-          title: body?.message,
-          variant: "warning",
-        });
-      } else {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again",
-          variant: "destructive",
-        });
-      }
-      router.replace("/dashboard");
-      router.refresh();
     } else {
-      const movieResponse = await fetch("/api/movies/add", {
+      await callAddDataApi({
+        url: "/api/movies/add",
         method: "POST",
-        body: JSON.stringify({
-          posterImage: url,
+        body: {
+          posterImage: url, // Ensure `url` is defined and accessible
           releaseYear: parseInt(data.year, 10),
           title: data.title,
-        }),
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-
-      if (movieResponse.ok) {
-        toast({
-          title: "Lights, Camera, Action! Movie added!",
-          description: "Like 'The Godfather,' this one's now a part of the family.",
-          variant: "default",
-        });
-        router.replace("/dashboard");
-        router.refresh();
-      } else {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again",
-          variant: "destructive",
-        });
-        console.error("Failed to add movie");
-      }
     }
   };
 
@@ -190,7 +210,8 @@ function MovieForm({ movie }: { movie?: IMovie }) {
                   const currentYear = new Date().getFullYear(); // Get the current year
                   if (isNaN(year)) return "Year must be a number";
                   if (year <= 1700) return "Year must be greater than 1700";
-                  if (year > currentYear) return `Year cannot exceed the current year (${currentYear})`;
+                  if (year > currentYear)
+                    return `Year cannot exceed the current year (${currentYear})`;
                   return true; // Valid
                 },
               }}
